@@ -1,47 +1,34 @@
-# Compiler flags
-CFLAGS = -Wall -Wextra -Werror
-MFLAGS	= -lXext -lX11 -lm -lbsd
+PROG    = so_long
 
-# Directories
-SRCDIR = srcs
-OBJDIR = objs
-FT_PRINTFDIR = all_libs/ft_printf
-LIBFTDIR = all_libs/ft_printf/libft
-MLXDIR = libs/mlx
+SRCS    =	main.c errors.c utilsmove.c utilsimage.c mapstuff/mapfiletoarray.c mapstuff/utilsvalmap.c mapstuff/utilsvalmap2.c \
+		 all_libs/gnl/get_next_line.c  all_libs/gnl/get_next_line_utils.c utilstime.c graphic.c itoa.c \
+		 enemy.c mapstuff/utilsvalmap3.c
 
-# Libraries
-LIBSFLAG = -L$(LIBFTDIR) -lft -L$(FT_PRINTFDIR) -lftprintf -L$(MLXDIR) -lmlx_Linux
-
-# Source files
-SRCS = so_long.c \
-	   srcs/fd_to_string.c 
-OBJS = so_long.o \
-	   objs/fd_to_string.o 
-
-# Executable name
-NAME = so_long
-
-all: $(NAME)
-
-$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
-	$(CC) -Wall -Wextra -Werror  $(LIBSFLAG) -I/usr/include -I$(MLXDIR) -O3 -c $< -o $@
+OBJS     = ${SRCS:.c=.o}
+MAIN    = main.c
 
 
-$(NAME): $(OBJS)
-	@ make -C $(FT_PRINTFDIR)
-	@ make -C $(MLXDIR)
-	@ make -C $(LIBFTDIR)
-	$(CC) $(OBJS) -L$(MLXDIR) -lmlx_Linux -L/usr/lib -I$(MLXDIR) -lXext -lX11 -lm -lz $(LIBSFLAG) -o $(NAME)
+CC         = gcc
+CFLAGS     = -Wall -Wextra -Werror -g
 
-$(OBJDIR):
-	mkdir -p $@
+%.o : %.c
+	@gcc ${CFLAGS} ${HEADER} -Imlx -c $< -o $(<:.c=.o)
+
+all:         ${PROG}
+
+${PROG}:    ${OBJS}
+						@make -C mlx
+						@make -C all_libs/ft_printf
+						@$(CC) ${OBJS} -lmlx -lXext -lX11 -L mlx -o${PROG} all_libs/ft_printf/libftprintf.a
 
 clean:
-	rm -rf $(OBJDIR)
+						@rm -f ${OBJS}
 
-fclean: clean
-	rm -f $(NAME)
 
-re: fclean all
+fclean:     clean
+						@rm -f $(NAME)
+						@rm -f ${PROG}
+
+re:            fclean all
 
 .PHONY: all clean fclean re

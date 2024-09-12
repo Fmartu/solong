@@ -13,69 +13,71 @@
 #include "map.h"
 
 static int	nline(char *file);
-static int singlecolumnall(char *file);
+static char	**singlecolumnall(char *file);
 
-char **finalmap(char *file)
+char	**finalmap(char *file)
 {
-	int **map;
-	int fd;
-	int i;
+	char	**map;
+	int		fd;
+	int		i;
+	int		nlin;
 
 	i = 0;
 	map = singlecolumnall(file);
-	if(!map)
-		return(0);
+	if (map == NULL)
+		return (NULL);
+	nlin = nline(file);
+	if (nlin == 0)
+		return (NULL);
 	fd = open(file, O_RDONLY);
-	while (1)
-		get_next_line(fd, &map[i++]);
+	if (fd <= 0)
+		return (NULL);
+	while (i < nlin)
+	{
+		map[i] = get_next_line(fd);
+		i++;
+	}
 	map[i] = NULL;
 	close(fd);
-	return(map);
+	return (map);
 }
-
 
 static int	nline(char *file)
 {
-	int fd;
-	int line;
-	int chareader;
-	char n;
+	int		fd;
+	int		line;
+	int		chareader;
+	char	n;
 
-	line = 1
-	chareader = 0;
+	line = 1;
+	chareader = 1;
 	fd = open(file, O_RDONLY);
 	if (!fd)
-		return(0)
+		return (0);
 	while (chareader != 0)
 	{
 		chareader = read(fd, &n, 1);
 		if (chareader == 0)
-			break;
+			break ;
 		else if (chareader < 0)
-			return(0);
-		else (n == '\n')
-			line++;
+			return (0);
+		else if (n == '\n')
+			line++ ;
 	}
 	close(fd);
-	return(line);
+	return (line);
 }
 
-static int singlecolumnall(char *file)
+static char	**singlecolumnall(char *file)
 {
-	int nlines;
-	char **fullmap;
+	int		nlines;
+	char	**fullmap;
 
 	nlines = nline(file);
-	if (nline == 0)
-	{
-		ft_printf("Error: fd error");
-		return(0);
-	}
-	fullmap = malloc(sizeof(char *) * nline + 1);
+	if (nlines == 0)
+		return (NULL);
+	fullmap = malloc(sizeof(char *) * (nlines + 1));
 	if (!fullmap)
-	{
-		ft_printf("Error: malloc error");
-		return (0);
-	}
-	return(fullmap);
+		return (NULL);
+	return (fullmap);
 }
